@@ -319,6 +319,8 @@ if ( in_array(
 		array(
 			'wp-app.php',
 			'xmlrpc.php',
+			'ms-files.php',
+			'wp-cron.php',
 		) ) )
 	return;
 
