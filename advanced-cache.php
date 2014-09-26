@@ -180,7 +180,7 @@ class batcache {
 			'time' => time(),
 			'timer' => $this->timer_stop(false, 3),
 			'headers' => array(),
-			'status_header' => $this->status_header,
+			'status_header' => isset( $this->status_header ) ? $this->status_header : null,
 			'redirect_status' => $this->redirect_status,
 			'redirect_location' => $this->redirect_location,
 			'version' => $this->url_version
@@ -398,8 +398,8 @@ if ( $batcache->is_ssl() )
 // Recreate the permalink from the URL
 $batcache->permalink = 'http://' . $batcache->keys['host'] . $batcache->keys['path'] . ( isset($batcache->keys['query']['p']) ? "?p=" . $batcache->keys['query']['p'] : '' );
 $batcache->url_key = md5($batcache->permalink);
-$batcache->url_version = (int) wp_cache_get("{$batcache->url_key}_version", $batcache->group);
 $batcache->configure_groups();
+$batcache->url_version = (int) wp_cache_get("{$batcache->url_key}_version", $batcache->group);
 $batcache->do_variants();
 $batcache->generate_keys();
 
@@ -423,8 +423,10 @@ if ( $batcache->seconds < 1 || $batcache->times < 2 ) {
 }
 
 // If the document has been updated and we are the first to notice, regenerate it.
-if ( $batcache->do !== false && isset($batcache->cache['version']) && $batcache->cache['version'] < $batcache->url_version )
+if ( isset($batcache->cache['version']) && $batcache->cache['version'] < $batcache->url_version ) {
+	$batcache->do = true;
 	$batcache->genlock = wp_cache_add("{$batcache->url_key}_genlock", 1, $batcache->group, 10);
+}
 
 // Temporary: remove after 2010-11-12. I added max_age to the cache. This upgrades older caches on the fly.
 if ( !isset($batcache->cache['max_age']) )
