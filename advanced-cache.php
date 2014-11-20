@@ -379,7 +379,8 @@ if ( ! method_exists( $GLOBALS['wp_object_cache'], 'incr' ) )
 	$batcache->times = 0;
 
 // Necessary to prevent clients using cached version after login cookies set. If this is a problem, comment it out and remove all Last-Modified headers.
-header('Vary: Cookie', false);
+if ( $batcache->is_ssl() )
+	header('Vary: Cookie', false);
 
 // Things that define a unique page.
 if ( isset( $_SERVER['QUERY_STRING'] ) )
